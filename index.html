@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Boutique de Aromas | Loja Santa Rosa</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome para ícones -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Inter:wght@400;500;600;700&family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet" />
+  <!-- Folha de Estilos Personalizada -->
+  <link rel="stylesheet" href="style.css" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            aromaGreen: '#556b52',
+            aromaGreenDark: '#3f513d',
+            aromaGreenLight: '#e9efe8',
+            aromaCream: '#f8f7f4',
+            aromaSand: '#ebe7df',
+            aromaGold: '#b89b67',
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            brand: ['Montserrat', 'sans-serif'],
+            serif: ['Cormorant Garamond', 'serif'],
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-aromaCream text-gray-800 font-sans min-h-screen flex flex-col">
+
+  <!-- Barra Superior Discreta com Acesso ao Painel Admin -->
+  <div class="bg-aromaGreenDark text-white/90 text-xs py-2 px-4">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+      <span class="flex items-center gap-1.5">
+        <i class="fas fa-leaf text-aromaGreenLight"></i>
+        <span>Perfumaria para Ambientes, Velas Aromáticas & Presentes — Santa Rosa</span>
+      </span>
+      <button onclick="openAdminAccess()" class="bg-white/15 hover:bg-white/25 text-white font-semibold px-3 py-1 rounded-lg transition flex items-center gap-1.5">
+        <i class="fas fa-lock text-[11px]"></i>
+        <span>Painel</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Cabeçalho Principal com Identidade Visual Boutique de Aromas -->
+  <header class="bg-white sticky top-0 z-30 shadow-sm border-b border-aromaSand">
+    <div class="max-w-7xl mx-auto px-4 py-3.5 flex flex-col md:flex-row items-center justify-between gap-4">
+
+      <!-- Logo Boutique de Aromas - Loja Santa Rosa -->
+      <a href="#" onclick="resetFilters(); return false;" class="flex items-center gap-3 select-none group">
+        <svg class="w-48 h-14 transition-transform group-hover:scale-[1.02]" viewBox="0 0 280 86" xmlns="http://www.w3.org/2000/svg">
+          <rect width="280" height="86" rx="10" fill="#ffffff" />
+          <text x="140" y="32" text-anchor="middle" fill="#556b52" font-family="'Montserrat', sans-serif" font-weight="700" font-size="25" letter-spacing="-0.5">Boutique</text>
+          <text x="140" y="57" text-anchor="middle" fill="#556b52" font-family="'Montserrat', sans-serif" font-weight="700" font-size="25" letter-spacing="-0.5">de Aromas</text>
+          <path d="M 103 49 Q 110 45 117 49" stroke="#556b52" stroke-width="2.2" fill="none" stroke-linecap="round" />
+          <text x="140" y="76" text-anchor="middle" fill="#556b52" font-family="'Inter', sans-serif" font-weight="500" font-size="13" letter-spacing="0.5">Loja Santa Rosa</text>
+        </svg>
+      </a>
+
+      <!-- Barra de Pesquisa -->
+      <div class="w-full md:max-w-lg relative">
+        <input
+          type="text"
+          id="searchInput"
+          oninput="handleSearch(this.value)"
+          placeholder="Buscar difusores, velas, home spray, essências..."
+          class="w-full bg-aromaCream text-gray-800 placeholder-gray-500 border border-aromaSand rounded-xl py-2.5 pl-4 pr-20 text-sm focus:outline-none focus:ring-2 focus:ring-aromaGreen"
+        />
+        <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute right-11 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 p-1" title="Limpar pesquisa">
+          <i class="fas fa-times"></i>
+        </button>
+        <span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-aromaGreen">
+          <i class="fas fa-search"></i>
+        </span>
+      </div>
+
+      <!-- Botões de Ação: Painel e Sacola -->
+      <div class="flex items-center gap-2.5 self-end md:self-auto">
+        <button onclick="openAdminAccess()" class="bg-aromaGreenLight hover:bg-[#dce5db] text-aromaGreenDark px-4 py-2.5 rounded-xl text-sm font-semibold transition flex items-center gap-2">
+          <i class="fas fa-user-shield"></i>
+          <span>Painel</span>
+        </button>
+
+        <button onclick="toggleCartModal()" class="relative bg-aromaGreen hover:bg-aromaGreenDark text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition flex items-center gap-2.5 shadow-sm">
+          <i class="fas fa-shopping-bag"></i>
+          <span id="headerCartTotal" class="hidden sm:inline">R$ 0,00</span>
+          <span id="cartBadge" class="bg-white text-aromaGreenDark text-xs font-extrabold px-2 py-0.5 rounded-full">0</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Seção Inicial: Galeria de Imagens e Destaques Sensoriais Acima da Loja -->
+  <section class="bg-gradient-to-b from-white to-aromaCream border-b border-aromaSand">
+    <div class="max-w-7xl mx-auto px-4 py-7">
+
+      <!-- Banner Customizado (quando configurado no Painel Admin) -->
+      <div id="customHeroBannerWrapper" class="hidden mb-6 rounded-2xl overflow-hidden shadow-md border border-aromaSand">
+        <img id="customHeroBannerImg" src="" alt="Banner Boutique de Aromas" class="w-full max-h-[380px] object-cover" />
+      </div>
+
+      <!-- Galeria Editorial de Imagens no Início -->
+      <div id="defaultHeroGallery" class="grid grid-cols-1 md:grid-cols-12 gap-4">
+
+        <!-- Imagem Principal Esquerda -->
+        <div class="md:col-span-6 relative rounded-2xl overflow-hidden min-h-[270px] sm:min-h-[320px] shadow-md group gallery-card">
+          <img
+            src="https://images.unsplash.com/photo-1602928321679-560bb453f190?auto=format&fit=crop&w=900&q=80"
+            alt="Difusores de Varetas e Aromas"
+            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+          />
+          <div class="absolute inset-0 bg-gradient-to-t from-[#2a3628]/90 via-[#2a3628]/35 to-transparent flex flex-col justify-end p-6 text-white">
+            <span class="bg-white/20 backdrop-blur-sm text-white text-[11px] font-semibold uppercase tracking-widest px-3 py-1 rounded-full w-fit mb-2">
+              Santa Rosa • RS
+            </span>
+            <h1 class="font-serif text-3xl sm:text-4xl font-bold leading-tight">
+              Desperte sensações e transforme seu ambiente
+            </h1>
+            <p class="text-white/90 text-xs sm:text-sm mt-2 max-w-md">
+              Difusores de varetas, velas aromáticas artesanais, home sprays e kits exclusivos para presentear.
+            </p>
+            <div class="mt-4">
+              <a href="#vitrineLoja" class="inline-flex items-center gap-2 bg-white text-aromaGreenDark hover:bg-aromaGreenLight font-bold text-xs sm:text-sm px-5 py-2.5 rounded-xl transition shadow">
+                <span>Explorar Coleção</span>
+                <i class="fas fa-arrow-down"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Coluna Direita: 4 Imagens de Categorias Olfativas -->
+        <div class="md:col-span-6 grid grid-cols-2 gap-4">
+
+          <div onclick="filterCategory('Difusores')" class="cursor-pointer relative rounded-2xl overflow-hidden h-36 sm:h-[152px] shadow-sm group gallery-card">
+            <img src="https://images.unsplash.com/photo-1616401784845-180882ba9ba8?auto=format&fit=crop&w=500&q=80" alt="Difusores de Ambiente" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent flex flex-col justify-end p-3.5">
+              <span class="text-[10px] uppercase tracking-wider text-aromaGreenLight font-semibold">Perfume Contínuo</span>
+              <h3 class="text-white font-bold text-sm">Difusores de Varetas</h3>
+            </div>
+          </div>
+
+          <div onclick="filterCategory('Velas Aromáticas')" class="cursor-pointer relative rounded-2xl overflow-hidden h-36 sm:h-[152px] shadow-sm group gallery-card">
+            <img src="https://images.unsplash.com/photo-1603006905003-be475563bc59?auto=format&fit=crop&w=500&q=80" alt="Velas Aromáticas" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent flex flex-col justify-end p-3.5">
+              <span class="text-[10px] uppercase tracking-wider text-amber-200 font-semibold">Aconchego</span>
+              <h3 class="text-white font-bold text-sm">Velas Aromáticas</h3>
+            </div>
+          </div>
+
+          <div onclick="filterCategory('Home Spray')" class="cursor-pointer relative rounded-2xl overflow-hidden h-36 sm:h-[152px] shadow-sm group gallery-card">
+            <img src="https://images.unsplash.com/photo-1595425970377-c9703cf48b6d?auto=format&fit=crop&w=500&q=80" alt="Home Spray e Água de Lençóis" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent flex flex-col justify-end p-3.5">
+              <span class="text-[10px] uppercase tracking-wider text-aromaGreenLight font-semibold">Frescor Imediato</span>
+              <h3 class="text-white font-bold text-sm">Home Spray & Tecidos</h3>
+            </div>
+          </div>
+
+          <div onclick="filterCategory('Kits Presente')" class="cursor-pointer relative rounded-2xl overflow-hidden h-36 sm:h-[152px] shadow-sm group gallery-card">
+            <img src="https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&w=500&q=80" alt="Kits para Presente" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent flex flex-col justify-end p-3.5">
+              <span class="text-[10px] uppercase tracking-wider text-amber-200 font-semibold">Especial</span>
+              <h3 class="text-white font-bold text-sm">Kits & Presentes</h3>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Barra de Categorias e Ordenação -->
+      <div class="mt-6 flex flex-wrap items-center justify-center sm:justify-between gap-3 pt-2">
+        <div class="flex flex-wrap justify-center gap-2">
+          <button onclick="filterCategory('Todos')" class="cat-btn bg-aromaGreen text-white px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition shadow-sm">Todos</button>
+          <button onclick="filterCategory('Difusores')" class="cat-btn bg-white hover:bg-aromaGreenLight text-aromaGreenDark border border-aromaSand px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition">Difusores</button>
+          <button onclick="filterCategory('Velas Aromáticas')" class="cat-btn bg-white hover:bg-aromaGreenLight text-aromaGreenDark border border-aromaSand px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition">Velas Aromáticas</button>
+          <button onclick="filterCategory('Home Spray')" class="cat-btn bg-white hover:bg-aromaGreenLight text-aromaGreenDark border border-aromaSand px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition">Home Spray</button>
+          <button onclick="filterCategory('Kits Presente')" class="cat-btn bg-white hover:bg-aromaGreenLight text-aromaGreenDark border border-aromaSand px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition">Kits Presente</button>
+        </div>
+
+        <div class="flex items-center gap-2 text-xs sm:text-sm">
+          <label for="sortSelect" class="text-gray-600 font-medium">Ordenar:</label>
+          <select id="sortSelect" onchange="renderStoreProducts()" class="bg-white border border-aromaSand rounded-xl px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-aromaGreen">
+            <option value="recent">Mais recentes</option>
+            <option value="price-asc">Menor preço</option>
+            <option value="price-desc">Maior preço</option>
+            <option value="name">Ordem alfabética (A-Z)</option>
+          </select>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Vitrine da Loja -->
+  <main id="vitrineLoja" class="flex-grow max-w-7xl w-full mx-auto px-4 py-8">
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-2">
+      <div>
+        <h2 class="font-serif text-2xl sm:text-3xl font-bold text-aromaGreenDark">Catálogo Boutique de Aromas</h2>
+        <p id="resultsCount" class="text-xs sm:text-sm text-gray-500">Carregando fragrâncias...</p>
+      </div>
+    </div>
+
+    <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+
+    <div id="emptySearchState" class="hidden text-center py-16 bg-white rounded-2xl shadow-sm border border-aromaSand">
+      <div class="w-16 h-16 bg-aromaGreenLight text-aromaGreen rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+        <i class="fas fa-spa"></i>
+      </div>
+      <h3 class="text-lg font-bold text-gray-800">Nenhuma fragrância encontrada</h3>
+      <p class="text-gray-500 text-sm mt-1 max-w-md mx-auto">Não encontramos produtos com esse termo. Tente buscar por difusor, vela, lavanda ou baunilha.</p>
+      <button onclick="resetFilters()" class="mt-4 bg-aromaGreen hover:bg-aromaGreenDark text-white font-semibold px-5 py-2.5 rounded-xl transition">
+        Ver todo o catálogo
+      </button>
+    </div>
+  </main>
+
+  <!-- Seção Final: Contatos (WhatsApp, Instagram) e Localização -->
+  <footer id="contatosFooter" class="bg-aromaGreenDark text-white mt-12 border-t-4 border-aromaGold">
+    <div class="max-w-7xl mx-auto px-4 py-12">
+
+      <div class="text-center max-w-2xl mx-auto mb-10">
+        <span class="bg-white/15 text-aromaGreenLight text-xs font-semibold uppercase px-3 py-1 rounded-full tracking-wider">Atendimento & Loja Física</span>
+        <h2 class="font-serif text-3xl sm:text-4xl font-bold mt-2">Boutique de Aromas — Loja Santa Rosa</h2>
+        <p class="text-white/80 text-sm mt-1.5">Entre em contato pelo nosso WhatsApp, acompanhe as novidades no Instagram ou venha sentir nossas fragrâncias pessoalmente.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+        <!-- Card 1: WhatsApp -->
+        <div class="bg-white/10 backdrop-blur-sm p-6 rounded-2xl border border-white/15 flex flex-col justify-between">
+          <div>
+            <div class="w-12 h-12 rounded-xl bg-emerald-500/20 text-emerald-300 flex items-center justify-center text-2xl mb-4">
+              <i class="fab fa-whatsapp"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white">WhatsApp</h3>
+            <p class="text-white/75 text-sm mt-1">Atendimento personalizado para pedidos, dúvidas sobre essências e presentes corporativos.</p>
+            <p id="displayWhatsappText" class="text-emerald-300 font-bold text-base mt-3">(55) 99999-9999</p>
+          </div>
+          <a id="linkWhatsappBtn" href="https://wa.me/5555999999999" target="_blank" rel="noopener noreferrer" class="mt-5 w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 px-4 rounded-xl transition flex items-center justify-center gap-2 text-sm shadow">
+            <i class="fab fa-whatsapp text-lg"></i>
+            <span>Conversar no WhatsApp</span>
+          </a>
+        </div>
+
+        <!-- Card 2: Instagram -->
+        <div class="bg-white/10 backdrop-blur-sm p-6 rounded-2xl border border-white/15 flex flex-col justify-between">
+          <div>
+            <div class="w-12 h-12 rounded-xl bg-pink-500/20 text-pink-200 flex items-center justify-center text-2xl mb-4">
+              <i class="fab fa-instagram"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white">Instagram</h3>
+            <p class="text-white/75 text-sm mt-1">Acompanhe nossos lançamentos, dicas de aromatização de ambientes e bastidores da loja.</p>
+            <p id="displayInstagramHandle" class="text-pink-200 font-bold text-base mt-3">@boutiquedearomassantarosa</p>
+          </div>
+          <a id="linkInstagramBtn" href="https://www.instagram.com/boutiquedearomassantarosa" target="_blank" rel="noopener noreferrer" class="mt-5 w-full bg-gradient-to-r from-purple-600 via-pink-600 to-amber-500 hover:opacity-95 text-white font-bold py-3 px-4 rounded-xl transition flex items-center justify-center gap-2 text-sm shadow">
+            <i class="fab fa-instagram text-lg"></i>
+            <span>Seguir no Instagram</span>
+          </a>
+        </div>
+
+        <!-- Card 3: Localização -->
+        <div class="bg-white/10 backdrop-blur-sm p-6 rounded-2xl border border-white/15 flex flex-col justify-between">
+          <div>
+            <div class="w-12 h-12 rounded-xl bg-aromaGold/25 text-amber-200 flex items-center justify-center text-2xl mb-4">
+              <i class="fas fa-location-dot"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white">Localização</h3>
+            <p id="displayAddressText" class="text-white font-semibold text-sm mt-2 bg-black/20 p-3 rounded-xl border border-white/10">
+              📍 Centro — Santa Rosa / RS
+            </p>
+            <p class="text-xs text-white/80 mt-3">
+              <i class="far fa-clock mr-1.5 text-amber-200"></i>Seg à Sex: 09h às 18:30 | Sáb: 09h às 13h
+            </p>
+          </div>
+          <a id="linkMapsBtn" href="https://www.google.com/maps/search/?api=1&query=Boutique+de+Aromas+Santa+Rosa+RS" target="_blank" rel="noopener noreferrer" class="mt-5 w-full bg-white text-aromaGreenDark hover:bg-aromaGreenLight font-bold py-3 px-4 rounded-xl transition flex items-center justify-center gap-2 text-sm shadow">
+            <i class="fas fa-map-marked-alt"></i>
+            <span>Abrir no Google Maps</span>
+          </a>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="bg-[#324130] border-t border-white/10">
+      <div class="max-w-7xl mx-auto px-4 py-5 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs text-white/75">
+        <div class="flex items-center gap-2">
+          <span class="font-brand font-bold text-white text-sm">Boutique de Aromas</span>
+          <span>• Loja Santa Rosa &copy; 2026</span>
+        </div>
+        <button onclick="openAdminAccess()" class="text-white/80 hover:text-white underline transition">
+          Acesso Painel Administrador
+        </button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Botão Flutuante WhatsApp -->
+  <a id="floatingWhatsappBtn" href="https://wa.me/5555999999999" target="_blank" rel="noopener noreferrer" title="Fale no WhatsApp" class="whatsapp-float fixed bottom-5 left-5 z-30 bg-emerald-500 hover:bg-emerald-600 text-white w-14 h-14 rounded-full shadow-xl flex items-center justify-center text-3xl transition-transform hover:scale-110">
+    <i class="fab fa-whatsapp"></i>
+  </a>
+
+  <!-- MODAL 1: SACOLA / CARRINHO DE COMPRAS -->
+  <div id="cartModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 hidden flex justify-end transition-opacity">
+    <div class="bg-white w-full max-w-md h-full flex flex-col shadow-2xl">
+      <div class="bg-aromaGreenDark text-white px-6 py-4 flex items-center justify-between border-b-2 border-aromaGold">
+        <div class="flex items-center gap-2.5">
+          <i class="fas fa-shopping-bag text-amber-200 text-xl"></i>
+          <h3 class="text-lg font-bold">Sua Sacola</h3>
+        </div>
+        <button onclick="toggleCartModal()" class="text-white/70 hover:text-white p-1.5 rounded-lg transition">
+          <i class="fas fa-times text-xl"></i>
+        </button>
+      </div>
+
+      <div id="cartItemsContainer" class="flex-grow overflow-y-auto p-5 space-y-4 custom-scrollbar"></div>
+
+      <div id="cartFooter" class="border-t border-gray-200 bg-aromaCream p-5 space-y-4">
+        <div class="space-y-2.5 bg-white p-3.5 rounded-xl border border-aromaSand">
+          <p class="text-xs font-bold uppercase text-aromaGreenDark tracking-wider">Dados para Finalizar Pedido</p>
+          <input type="text" id="customerName" placeholder="Seu Nome Completo *" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-aromaGreen" />
+          <div class="grid grid-cols-2 gap-2">
+            <input type="text" id="customerPhone" placeholder="WhatsApp *" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-aromaGreen" />
+            <select id="paymentMethod" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-aromaGreen bg-white">
+              <option value="PIX">PIX</option>
+              <option value="Cartão de Crédito">Cartão de Crédito</option>
+              <option value="Dinheiro / Retirada">Retirar na Loja</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex justify-between items-center text-lg font-extrabold text-aromaGreenDark">
+          <span>Total:</span>
+          <span id="cartModalTotal" class="text-aromaGreen text-2xl">R$ 0,00</span>
+        </div>
+
+        <button onclick="checkoutOrder()" class="w-full bg-aromaGreen hover:bg-aromaGreenDark text-white font-bold py-3.5 rounded-xl shadow-md transition flex items-center justify-center gap-2 text-base">
+          <i class="fas fa-check-circle"></i>
+          <span>Concluir Compra</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: LOGIN DO PAINEL ADMINISTRADOR -->
+  <div id="adminLoginModal" class="fixed inset-0 bg-black/65 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border border-aromaSand modal-enter">
+      <div class="bg-aromaGreenDark text-white px-6 py-5 flex items-center justify-between border-b-4 border-aromaGold">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-white/15 rounded-xl flex items-center justify-center text-white text-lg">
+            <i class="fas fa-lock"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-lg leading-tight">Painel Administrador</h3>
+            <p class="text-xs text-white/80">Boutique de Aromas — Santa Rosa</p>
+          </div>
+        </div>
+        <button onclick="closeLoginModal()" class="text-white/70 hover:text-white p-1">
+          <i class="fas fa-times text-lg"></i>
+        </button>
+      </div>
+
+      <form onsubmit="handleAdminLogin(event)" class="p-6 space-y-4">
+        <div id="loginErrorMsg" class="hidden bg-red-50 border-l-4 border-red-600 text-red-700 p-3 rounded text-sm font-medium">
+          Usuário ou senha incorretos!
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1">Usuário</label>
+          <input type="text" id="adminUser" required placeholder="admin" class="w-full border border-gray-300 rounded-xl py-2.5 px-4 focus:outline-none focus:ring-2 focus:ring-aromaGreen" />
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1">Senha</label>
+          <input type="password" id="adminPass" required placeholder="••••••" class="w-full border border-gray-300 rounded-xl py-2.5 px-4 focus:outline-none focus:ring-2 focus:ring-aromaGreen" />
+        </div>
+
+        <p class="text-[11px] text-gray-400">Acesso padrão: usuário <strong>admin</strong> | senha <strong>senha123</strong></p>
+
+        <button type="submit" class="w-full bg-aromaGreen hover:bg-aromaGreenDark text-white font-bold py-3 rounded-xl transition shadow-md flex items-center justify-center gap-2">
+          <i class="fas fa-sign-in-alt"></i>
+          <span>Entrar no Painel</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 3: DASHBOARD ADMINISTRADOR COMPLETO -->
+  <div id="adminDashboardModal" class="fixed inset-0 bg-gray-900/75 backdrop-blur-sm z-50 hidden overflow-y-auto">
+    <div class="min-h-screen flex items-center justify-center p-2 sm:p-6">
+      <div class="bg-aromaCream w-full max-w-6xl rounded-2xl shadow-2xl overflow-hidden border border-aromaSand flex flex-col max-h-[92vh]">
+
+        <div class="bg-aromaGreenDark text-white px-6 py-4 flex flex-wrap items-center justify-between gap-4 border-b-4 border-aromaGold">
+          <div>
+            <h2 class="text-lg sm:text-xl font-bold leading-none">Painel Administrador • Boutique de Aromas</h2>
+            <p class="text-xs text-white/80 mt-1">Adicione, edite ou exclua produtos e acompanhe o histórico de vendas</p>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button onclick="logoutAdmin()" class="bg-white/15 hover:bg-white/25 text-white px-3 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-1.5">
+              <i class="fas fa-sign-out-alt"></i> Sair
+            </button>
+            <button onclick="closeAdminDashboard()" class="bg-white text-aromaGreenDark hover:bg-aromaGreenLight px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-1.5">
+              <i class="fas fa-store"></i> Ver Loja
+            </button>
+          </div>
+        </div>
+
+        <div class="bg-white border-b border-aromaSand px-6 flex flex-wrap gap-6">
+          <button onclick="switchAdminTab('products')" id="tabBtnProducts" class="py-3.5 font-bold text-sm border-b-2 border-aromaGreen text-aromaGreen flex items-center gap-2 transition">
+            <i class="fas fa-boxes-stacked"></i>
+            <span>Produtos (<span id="adminProdCount">0</span>)</span>
+          </button>
+          <button onclick="switchAdminTab('orders')" id="tabBtnOrders" class="py-3.5 font-bold text-sm border-b-2 border-transparent text-gray-500 hover:text-gray-800 flex items-center gap-2 transition">
+            <i class="fas fa-receipt"></i>
+            <span>Histórico de Vendas (<span id="adminOrderCount">0</span>)</span>
+          </button>
+          <button onclick="switchAdminTab('settings')" id="tabBtnSettings" class="py-3.5 font-bold text-sm border-b-2 border-transparent text-gray-500 hover:text-gray-800 flex items-center gap-2 transition">
+            <i class="fas fa-sliders"></i>
+            <span>Banner & Contatos</span>
+          </button>
+        </div>
+
+        <div class="p-4 sm:p-6 overflow-y-auto flex-grow custom-scrollbar">
+
+          <!-- ABA 1: PRODUTOS -->
+          <div id="adminTabProducts" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+            <div class="lg:col-span-5 bg-white p-5 rounded-2xl shadow-sm border border-aromaSand h-fit">
+              <div class="flex items-center justify-between mb-4 pb-2 border-b border-gray-100">
+                <h3 id="formProductTitle" class="font-bold text-lg text-aromaGreenDark flex items-center gap-2">
+                  <i class="fas fa-plus-circle text-aromaGreen"></i>
+                  <span>Adicionar Produto</span>
+                </h3>
+                <button type="button" id="btnCancelEdit" onclick="resetProductForm()" class="hidden text-xs bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-2.5 py-1 rounded-lg">
+                  Cancelar
+                </button>
+              </div>
+
+              <form id="productForm" onsubmit="saveProduct(event)" class="space-y-4">
+                <input type="hidden" id="editProductId" value="" />
+
+                <div>
+                  <label class="block text-xs font-bold uppercase text-gray-600 mb-1">Nome do Produto *</label>
+                  <input type="text" id="prodName" required placeholder="Ex: Difusor Capim Limão 250ml" class="w-full border border-gray-300 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-aromaGreen" />
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-xs font-bold uppercase text-gray-600 mb-1">Valor (R$) *</label>
+                    <input type="number" id="prodPrice" step="0.01" min="0.01" required placeholder="89.90" class="w-full border border-gray-300 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-aromaGreen" />
+                  </div>
+                  <div>
+                    <label class="block text-xs font-bold uppercase text-gray-600 mb-1">Categoria</label>
+                    <select id="prodCategory" class="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-aromaGreen">
+                      <option value="Difusores">Difusores</option>
+                      <option value="Velas Aromáticas">Velas Aromáticas</option>
+                      <option value="Home Spray">Home Spray</option>
+                      <option value="Kits Presente">Kits Presente</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="bg-aromaCream p-3.5 rounded-xl border border-aromaSand space-y-2.5">
+                  <label class="block text-xs font-bold uppercase text-gray-600">Foto do Produto *</label>
+                  <label class="flex items-center justify-center gap-2 w-full bg-white hover:bg-aromaGreenLight border border-dashed border-aromaGreen rounded-xl py-2.5 px-3 text-xs font-semibold text-aromaGreenDark cursor-pointer transition">
+                    <i class="fas fa-upload"></i>
+                    <span>Escolher foto do dispositivo</span>
+                    <input type="file" id="prodImageFile" accept="image/*" onchange="handleImageUpload(event)" class="hidden" />
+                  </label>
+                  <div class="text-center text-[11px] text-gray-400 font-semibold">OU LINK DA IMAGEM</div>
+                  <input type="url" id="prodImageUrl" oninput="previewImageUrl(this.value)" placeholder="https://..." class="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-aromaGreen" />
+
+                  <div id="imagePreviewWrapper" class="hidden mt-2 relative w-full h-36 bg-white rounded-lg border border-gray-200 overflow-hidden flex items-center justify-center">
+                    <img id="imagePreview" src="" alt="Prévia" class="max-h-full max-w-full object-contain" />
+                    <button type="button" onclick="clearProductImage()" class="absolute top-1.5 right-1.5 bg-red-600 text-white w-6 h-6 rounded-full text-xs flex items-center justify-center shadow">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-xs font-bold uppercase text-gray-600 mb-1">Descrição & Notas Olfativas *</label>
+                  <textarea id="prodDesc" rows="3" required placeholder="Descreva o aroma, volume e sensações..." class="w-full border border-gray-300 rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-aromaGreen"></textarea>
+                </div>
+
+                <button type="submit" id="btnSubmitProduct" class="w-full bg-aromaGreen hover:bg-aromaGreenDark text-white font-bold py-3 rounded-xl shadow-md transition flex items-center justify-center gap-2">
+                  <i class="fas fa-save"></i>
+                  <span>Salvar Produto na Loja</span>
+                </button>
+              </form>
+            </div>
+
+            <div class="lg:col-span-7 bg-white p-5 rounded-2xl shadow-sm border border-aromaSand">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 pb-3 border-b border-gray-100">
+                <h3 class="font-bold text-lg text-aromaGreenDark">Produtos Cadastrados</h3>
+                <input type="text" id="adminSearchProd" oninput="renderAdminProducts()" placeholder="Filtrar produtos..." class="border border-gray-300 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-aromaGreen" />
+              </div>
+
+              <div id="adminProductsList" class="space-y-3 max-h-[540px] overflow-y-auto pr-1 custom-scrollbar"></div>
+            </div>
+
+          </div>
+
+          <!-- ABA 2: HISTÓRICO DE VENDAS -->
+          <div id="adminTabOrders" class="hidden space-y-6">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div class="bg-white p-4 rounded-2xl border border-aromaSand shadow-sm flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-aromaGreenLight text-aromaGreen flex items-center justify-center text-xl">
+                  <i class="fas fa-shopping-bag"></i>
+                </div>
+                <div>
+                  <p class="text-xs text-gray-500 font-semibold uppercase">Vendas Realizadas</p>
+                  <p id="statTotalOrders" class="text-2xl font-extrabold text-aromaGreenDark">0</p>
+                </div>
+              </div>
+
+              <div class="bg-white p-4 rounded-2xl border border-aromaSand shadow-sm flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-xl">
+                  <i class="fas fa-sack-dollar"></i>
+                </div>
+                <div>
+                  <p class="text-xs text-gray-500 font-semibold uppercase">Faturamento Total</p>
+                  <p id="statTotalRevenue" class="text-2xl font-extrabold text-emerald-700">R$ 0,00</p>
+                </div>
+              </div>
+
+              <div class="bg-white p-4 rounded-2xl border border-aromaSand shadow-sm flex items-center justify-between">
+                <div>
+                  <p class="text-xs text-gray-500 font-semibold uppercase">Registros</p>
+                  <p class="text-xs text-gray-400 mt-0.5">Limpar histórico</p>
+                </div>
+                <button onclick="clearOrderHistory()" class="bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 font-bold px-3.5 py-2 rounded-xl text-xs transition flex items-center gap-1.5">
+                  <i class="fas fa-trash-alt"></i> Limpar
+                </button>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-aromaSand shadow-sm overflow-hidden">
+              <div class="px-5 py-4 border-b border-gray-100">
+                <h3 class="font-bold text-lg text-aromaGreenDark">Histórico Completo de Vendas</h3>
+              </div>
+              <div id="adminOrdersList" class="divide-y divide-gray-100"></div>
+            </div>
+          </div>
+
+          <!-- ABA 3: CONFIGURAÇÕES DE BANNER & CONTATOS -->
+          <div id="adminTabSettings" class="hidden max-w-3xl mx-auto">
+            <form onsubmit="saveStoreSettings(event)" class="bg-white p-6 rounded-2xl border border-aromaSand shadow-sm space-y-6">
+              <div>
+                <h3 class="text-lg font-bold text-aromaGreenDark border-b border-gray-100 pb-2">Banner no Início da Loja</h3>
+                <p class="text-xs text-gray-500 mt-1 mb-3">Envie uma imagem própria para destacar no topo da loja ou mantenha a galeria sensorial padrão.</p>
+                <div class="space-y-3 bg-aromaCream p-4 rounded-xl border border-aromaSand">
+                  <label class="flex items-center justify-center gap-2 w-full bg-white hover:bg-aromaGreenLight border border-dashed border-aromaGreen rounded-xl py-2.5 px-3 text-xs font-semibold text-aromaGreenDark cursor-pointer transition">
+                    <i class="fas fa-upload"></i>
+                    <span>Escolher imagem de banner</span>
+                    <input type="file" accept="image/*" onchange="handleBannerUpload(event)" class="hidden" />
+                  </label>
+                  <input type="url" id="settingBannerUrl" placeholder="Ou cole o link da imagem de banner..." class="w-full border border-gray-300 rounded-lg px-3 py-2 text-xs bg-white" />
+                  <div class="flex justify-end">
+                    <button type="button" onclick="resetDefaultGalleryBanner()" class="text-xs text-aromaGreen hover:underline font-semibold">
+                      Restaurar galeria de imagens padrão
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h3 class="text-lg font-bold text-aromaGreenDark border-b border-gray-100 pb-2">Contatos e Localização</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-3">
+                  <div>
+                    <label class="block text-xs font-bold uppercase text-gray-600 mb-1">WhatsApp (com DDD)</label>
+                    <input type="text" id="settingWhatsapp" placeholder="5555999999999" class="w-full border border-gray-300 rounded-xl px-3.5 py-2.5 text-sm" />
+                  </div>
+                  <div>
+                    <label class="block text-xs font-bold uppercase text-gray-600 mb-1">@ Instagram</label>
+                    <input type="text" id="settingInstagramHandle" placeholder="@boutiquedearomassantarosa" class="w-full border border-gray-300 rounded-xl px-3.5 py-2.5 text-sm" />
+                  </div>
+                  <div class="sm:col-span-2">
+                    <label class="block text-xs font-bold uppercase text-gray-600 mb-1">Link do Instagram</label>
+                    <input type="url" id="settingInstagramUrl" placeholder="https://www.instagram.com/boutiquedearomassantarosa" class="w-full border border-gray-300 rounded-xl px-3.5 py-2.5 text-sm" />
+                  </div>
+                  <div class="sm:col-span-2">
+                    <label class="block text-xs font-bold uppercase text-gray-600 mb-1">Endereço da Loja</label>
+                    <input type="text" id="settingAddress" placeholder="Centro — Santa Rosa / RS" class="w-full border border-gray-300 rounded-xl px-3.5 py-2.5 text-sm" />
+                  </div>
+                </div>
+              </div>
+
+              <button type="submit" class="w-full bg-aromaGreen hover:bg-aromaGreenDark text-white font-bold py-3 rounded-xl shadow-md transition">
+                Salvar Alterações
+              </button>
+            </form>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE CONFIRMAÇÃO CUSTOMIZADO -->
+  <div id="confirmDialog" class="fixed inset-0 bg-black/60 z-[60] hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-aromaSand text-center space-y-4 modal-enter">
+      <div class="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto text-xl">
+        <i class="fas fa-exclamation-triangle"></i>
+      </div>
+      <h4 id="confirmTitle" class="text-lg font-bold text-gray-900">Confirmar</h4>
+      <p id="confirmMessage" class="text-sm text-gray-600">Deseja realmente continuar?</p>
+      <div class="flex gap-3 pt-2">
+        <button id="confirmCancelBtn" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2.5 rounded-xl transition">Cancelar</button>
+        <button id="confirmOkBtn" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-xl transition">Excluir</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-[70] flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- Script Principal -->
+  <script src="script.js"></script>
+</body>
+</html>
